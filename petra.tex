@@ -1,0 +1,122 @@
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\newcommand\given[1][]{\:#1\vert\:}
+\newcommand*{\estimates}{\mathrel{\hat=}}
+\begin{document}
+
+
+
+
+
+\begin{titlepage}
+		
+	\center % Center everything on the page
+	
+	%----------------------------------------------------------------------------------------
+	%	HEADING SECTIONS
+	%----------------------------------------------------------------------------------------
+	
+	\textsc{\LARGE FAKULTET ELEKTROTEHNIKE I RAČUNARSTVA}\\[3cm] % Name of your university/college
+	\textsc{\Large Projekt iz predmeta Raspoznavanje uzoraka}\\[0.5cm] % Major heading such as course name
+	\textsc{\large Ak. god. 2015/16}\\[1.5cm] % Minor heading such as course title
+	
+	%----------------------------------------------------------------------------------------
+	%	TITLE SECTION
+	%----------------------------------------------------------------------------------------
+	
+	
+	{ \huge \bfseries Oblikovati sustav za video nadzor u zatvorenom prostoru}\\[2cm] % Title of your document
+	
+	
+	%----------------------------------------------------------------------------------------
+	%	AUTHOR SECTION
+	%----------------------------------------------------------------------------------------
+	
+	\Large \emph{Autori:}\\
+	Silvestar \textsc{Badak}\\
+	Arijana \textsc{Brlek}\\
+	Tomislav \textsc{Gudelj}\\
+	Petra \textsc{Marče}\\
+	Nino \textsc{Uzelac}\\
+	Ante \textsc{Žužul}\\[3cm] % Your name
+	
+	%----------------------------------------------------------------------------------------
+	%	DATE SECTION
+	%----------------------------------------------------------------------------------------
+	
+	{\large \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
+	
+	%----------------------------------------------------------------------------------------
+	%	LOGO SECTION
+	%----------------------------------------------------------------------------------------
+	
+	%\includegraphics{Logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+	
+	%----------------------------------------------------------------------------------------
+	
+	\vfill % Fill the rest of the page with whitespace
+	
+\end{titlepage}
+\tableofcontents
+\renewcommand{\chaptername}{}
+\chapter{Projektni zadatak}
+\chapter{Postupak rješavanja zadatka}
+	\subsection{Primjena GMM modela za odvajanje objekata od pozadine u slici}
+	 Intenzitet svjetla na slici općenito zavisi od geometrije scene,položaju kamere i same osvijetljenosti scene. Ako pretpostavimo da se u videonadzornom sustavu ne mjenja položaj kamera te se stalno snima ista scena, jedino što može utjecati na promjene inteziteta svjetla u slikama jest osvijetljenost scene. Osvijetljenost scene se u praksi može mijenajti postupno kroz vrijeme ili iznenadno. Postupne se promjene osvijetljenja češće događaju u vanjskim scenama zbog promjene doba dana ili vremenskih prilika. Nagle promjene osvjetljenja u untrašnjim scenama mogu biti rezultat paljenja i gašenja svjetla u prostoriji. Da bi se model mogao prilagođavati promjenama osvijetljenja u sceni, potrebno je neprestano ažurirati skup za učenje novim informacijama o osvijetljenju a odbacivati stare. S tim ciljem odabire se  određeni vremenski period $T$, pa u trenutku $t$ na raspolaganju imamo skup uzoraka $X_T$. $$X_T=\{x^{(t)},x^{(t-1)},...,x^{(t-T)}\}$$  
+	 Odvajanje objekata od pozadine na slici može se promatrati kao klasifikacijski problem u dvije klase od kojih jedna pripada pozadini a druga objektima. Za svaki piksel slike dakle treba donjeti odluku pripada li pozadini ili nekom od objekata. U tom kontekstu $X_T$ je naš skup za učenje na temelju kojeg se donose klasifikacijske odluke. Model koji se u okviru ovog rada koristi za klasifikaciju je model Gaussove mješavine.
+	 
+	\subsubsection{Model Gaussove mješavine}
+	
+		
+		\begin{paragraph}
+		Model mješane gustoće vjerojatnosti općenito modelira se kao linearna kombinacija $M$ gustoća vjerojatnosti:
+		$$ p(\vec{x})= \sum_{m=1}^{M}\pi_{m} p({\vec{x} \given \vec{\theta_{m}}}) $$
+		gdje je $\pi_m$ težina komponente $m$ a $\theta_m$ predstavlja parametre konkretne razdiobe. Za težine komponenata vrijedi ograničenje:
+		$$\sum_{m=1}^{M}\pi_{m}=1$$ 
+		Gaussova mješavima je parametarska funkcija gustoće vjerojatnosti sačinjena od težinskih suma Gaussovih komponenata:
+			$$ p(\vec{x})= \sum_{m=1}^{M}\pi_{m} \mathcal{N}({\vec{x} \given \vec{\mu}_m,\Sigma_m}) $$
+		gdje su $\vec{\mu_m}$ i $\Sigma_m$ vektor očekivanja i kovarijancijska matrica m-te Gaussove razdiobe. Postoji više varijanti GMM-a u kojima kovarijancijske matrice mogu biti punog ranga ili dijagonalne, a parametri se mogu dijeliti ili vezati između Gaussovih komponenata. Izbor odgovarajuće varijante ovisi o količini dostupnih podataka za treniranje. U okviru ovog projekta koristi se diagonalna kovarijacijska matrica. Vrijedi:
+		$$\Sigma_m=\sigma_m^2 I$$
+		 Parametri Gaussovih razdioba dobiveni su kao statističke procjene nad skupom uzoraka pa je ispravnije pisati:
+			$$ \hat p(\vec{x} \given X_t)= \sum_{m=1}^{M}\hat\pi_{m} \mathcal{N}({\vec{x} \given \hat{\vec{\mu}}_m,\hat\sigma_m^2 I}) $$
+		
+		Kad god na raspolaganju imamo novi primjer za učenje, on se ubacuje u skup za učenje na mjesto najstarijeg primjera. S obzirom da se skup za učenje promjenio potrebno je ponovo procijeniti sve parametre razdioba i vrijednost funkcije $ p(\vec{x} \given X_t)$. Osim toga, provode se i sljedeće rekurzivne jednadžbe:
+		$$ \hat \pi_m \leftarrow \hat \pi_m +\alpha(o_m^{(t)}-\hat \pi_m) $$
+		$$ \hat{\vec{\mu}}_m \leftarrow \hat{\vec{\mu}}_m +o_m^{(t)}(\alpha / \hat \pi_m )\vec{\delta}_m $$
+		$$\hat\sigma_m^2\leftarrow \hat\sigma_m^2 +o_m^{(t)}(\alpha / \hat \pi_m )(\vec{\delta}^T_m\vec{\delta}_m-\hat\sigma_m^2)$$
+		
+		 gdje je $\vec{\delta}_m=\vec x^{(t)}-\hat{\vec{\mu}}_m$ razlika između primjera i srednje vrijednosti razdiobe. Umjesto već spomenutog vremenskog intervala $T$ ovdje je uvedena konstanta $\alpha=1/T$ koja ograničava utjecaj starijih informacija. Za novi primjer pripadnost $o_m^{(t)}$ je jednaka jedinici za komponentu $m$ koja je u blizini tog primjera te ima najveću važnost odnosno težinu $\hat\pi_m$. Za sve ostale komponente vrijedi $o_m^{(t)}=0$. Definiramo da je primjer blizu komponenti $m$ ukoliko je njegova Mahalanobisova udaljenost od nje primjerice manja od $3\hat\sigma_m$. Kvadratna udaljenost primjera od komponente $m$ računa se  kao 
+		 $$D_m^2(\vec x^{(t)}) = \vec{\delta}^T_m\vec{\delta}_m/\hat\sigma_m^2$$
+		Ukoliko primjer nije blizu nijedne komponente od njih $M$ generira se nova komponenta sa parametrima:
+		$$\hat\pi_{M+1}=\alpha$$
+		$$\hat{\vec{\mu}}_{M+1}=\vec x^{(t)}$$
+		$$\hat{\sigma}_{M+1}=\sigma_0$$
+		Ako je dostignut maksimalan broj komponenti odbacuje se komponenta s najmanjom težinom $\hat\pi_m$.
+	
+	Ovaj algoritam predstavlja on-line algoritam grupiranja. Tipično će objeki koji ne pripadaju pozadini biti reprezentirani dodatnim grupama sa malim težinama $\hat\pi_m$ Uzimajući to u obzir možemo aproksimirati model pozadine sa B najvećih grupa:
+	
+		$$ \hat p(\vec{x} \given {X_t,BG}) \approx \sum_{m=1}^{B}\hat\pi_{m} \mathcal{N}({\vec{x} \given \hat{\vec{\mu}}_m,\hat\sigma_m^2 I}) $$
+	
+	Ako su komponente sortitane po padajućim vrijednostima težina  $\hat\pi_m$ imamo:
+	$$B=\underset{b}{\mathrm{argmin}}(\sum_{m=1}^{b}{\hat\pi}_m}>(1-c_f))$$
+	gdje je $c_f$ mjera maksimalnog udjela piksela koji mogu pripadati prednjem dijelu slike bez utjecaja na model pozadine.
+	
+	Dođe li novi objekt u scenu i ostane statičan neko vrijeme, vjerojatno će generirati novi stabilni klaster. Kako je stara pozadina sada zaklonjena tim objektom, težina njegovog klastera $\pi_{B+1}$ će se konstantno povećavati. Ukoliko taj objekt ostane statičan dovoljno dugo, njegova će težina postati veća od $c_f$ i smatrat će se dijelom pozadine.
+		
+		\end{paragraph}
+	
+
+\chapter{Ispitivanje rješenja}
+Model Gaussove mješavine
+\chapter{Opis programske implementacije rješenja}
+\chapter{Zaključak}
+\chapter{Literatura}
+
+Model Gaussove mješavine
+\end{document}
