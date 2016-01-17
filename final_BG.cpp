@@ -62,7 +62,7 @@ int overall = 0;
 //Structure used for saving various components for each pixel
 struct gaussian
 {								
-	double mean[10], covariance;
+	double mean[3], covariance;
 	double weight;								// Represents the measure to which a particular component defines the pixel value
 	gaussian* Next;
 	gaussian* Previous;
