@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.1.16)  19 JAN 2016 02:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.1.16)  19 JAN 2016 11:36
 entering extended mode
 **./dokumentacija.tex
 (dokumentacija.tex
@@ -1018,13 +1018,13 @@ $$[]$ \OT1/cmr/m/n/12 = [] |  + [](\OML/cmm/m/it/12 o[] |  \OMS/cmsy/m/n/12   [
 ### simple group (level 1) entered at line 117 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 13133 strings out of 493634
- 221781 string characters out of 3135239
+ 13139 strings out of 493634
+ 221869 string characters out of 3135239
  267123 words of memory out of 3000000
- 16357 multiletter control sequences out of 15000+200000
+ 16363 multiletter control sequences out of 15000+200000
  65887 words of font info for 69 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 43i,5n,40p,10387b,341s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,5n,40p,10387b,349s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvi
 ps/fontname/8r.enc}<C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Flige/AppData/Local/Programs/MiKTeX 2
@@ -1043,7 +1043,7 @@ sers/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><
 C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.p
 fb><C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr
 i8a.pfb>
-Output written on dokumentacija.pdf (18 pages, 654549 bytes).
+Output written on dokumentacija.pdf (18 pages, 656772 bytes).
 PDF statistics:
  124 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

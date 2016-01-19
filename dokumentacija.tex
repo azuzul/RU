@@ -151,6 +151,25 @@ $$ \frac{\partial }{\partial \hat{\pi}_m}\left( log\mathcal{L} +log \prod_{m=1}^
 
 Treba još primjetiti da korištenje $$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t-Mc_T} (o_m^{(t)} - \hat{ \pi}_m^{(t-1)}) $$ nije previše korisno. Ako počnemo s velikom vrijednosti $ t $ tada izbjegavamo negativne popravke koji se događaju za malu vrijednost parametra $ t $, ali također gubimo utjecaj i apriornog znanja. Ovo nam predstavlja opravdanje zbog kojeg smo fiksirali utjecaj apriornog znanja.
 \chapter{Ispitivanje rješenja}
+\section{Ispitne Baze}
+U ovom projektu su za ispitne podatke korišteni videi. Izabrana su tri videa:
+\begin{enumerate}
+\item video sa puno pokreta u sceni (ubrzani snimak kretanja ljudi)
+\item video sa umjerenim brojem pokreta u sceni (snimak prolaska usporenog auta)
+\item video sa malim brojem pokreta u sceni(čovjek na benzinskoj stanici)
+\end{enumerate}
+
+Osim videa, za testiranje u realnom vremenu isprobavali smo i direktno snimanje sa web-kamere.
+
+Zbog ograničenih mogućnosti računalnog sklopovlja, svi videi (odnosno ulazi podaci iz kamere) su smanjene rezolucije (npr. 380x300). Korišteni algoritam za svaki piksel izgrađuje model s više komponenti, stoga za slike s manjom rezolucijom potrebno je izgraditi manje modela, što u konačnici rezultira bržim izvođenjem algoritma (složenost je $O(N^2)$). 
+
+Skup za učenje ovog algoritma je ovisan o trenutku u kojem se nalazimo, tj. neki određeni broj slika koji su bili prije slike koja se trenutno prikazuje. Odabiremo period $T$ i za neko vrijeme $t$ imamo sljedeći skup za učenje: $\chi^T = \{ x^{(t)}, x^{(t-1)}, ..., x^{(t-T)} \}$
+
+\section{Rezultati učenja i ispitavanja}
+
+
+\section{Analiza Rezultata}
+
 \chapter{Opis programske implementacije rješenja}
 \chapter{Zaključak}
 \bibliography{literatura}

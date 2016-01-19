@@ -8,6 +8,9 @@
 \contentsline {subsection}{\numberline {2.1.1}Model Gaussove mje\IeC {\v s}avine}{10}
 \contentsline {subsection}{\numberline {2.1.2}Biranje broja komponenti}{12}
 \contentsline {chapter}{\numberline {3}Ispitivanje rje\IeC {\v s}enja}{16}
+\contentsline {section}{\numberline {3.1}Ispitne Baze}{16}
+\contentsline {section}{\numberline {3.2}Rezultati u\IeC {\v c}enja i ispitavanja}{16}
+\contentsline {section}{\numberline {3.3}Analiza Rezultata}{16}
 \contentsline {chapter}{\numberline {4}Opis programske implementacije rje\IeC {\v s}enja}{17}
 \contentsline {chapter}{\numberline {5}Zaklju\IeC {\v c}ak}{18}
 \contentsline {chapter}{Literatura}{19}
