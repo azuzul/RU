@@ -1,0 +1,13 @@
+\select@language {croatian}
+\contentsline {chapter}{\numberline {1}Projektni zadatak}{5}
+\contentsline {section}{\numberline {1.1}Opis projektnog zadatka}{5}
+\contentsline {section}{\numberline {1.2}Pregled i opis srodnih rje\IeC {\v s}enja}{6}
+\contentsline {section}{\numberline {1.3}Konceptualno rje\IeC {\v s}enje zadatka}{8}
+\contentsline {chapter}{\numberline {2}Postupak rje\IeC {\v s}avanja zadatka}{10}
+\contentsline {section}{\numberline {2.1}Primjena GMM modela za odvajanje objekata od pozadine u slici}{10}
+\contentsline {subsection}{\numberline {2.1.1}Model Gaussove mje\IeC {\v s}avine}{10}
+\contentsline {subsection}{\numberline {2.1.2}Biranje broja komponenti}{12}
+\contentsline {chapter}{\numberline {3}Ispitivanje rje\IeC {\v s}enja}{16}
+\contentsline {chapter}{\numberline {4}Opis programske implementacije rje\IeC {\v s}enja}{17}
+\contentsline {chapter}{\numberline {5}Zaklju\IeC {\v c}ak}{18}
+\contentsline {chapter}{Literatura}{19}

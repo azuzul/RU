@@ -1,0 +1,68 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Elgammal et~al.(2000)Elgammal, Harwood, i Davis]{Elgammal}
+Ahmed~M. Elgammal, David Harwood, i Larry~S. Davis.
+\newblock Non-parametric model for background subtraction.
+\newblock U \emph{Proceedings of the 6th European Conference on Computer
+  Vision-Part II}, stranice 751--767, 2000.
+
+\bibitem[Harville(2002)]{Harville02aframework}
+Michael Harville.
+\newblock A framework for high-level feedback to adaptive, per-pixel,
+  mixture-of-gaussian background models.
+\newblock U \emph{In Proceedings of ECCV}, stranice 543--560, 2002.
+
+\bibitem[Kato et~al.(2002)Kato, Watanabe, Joga, Rittscher, i Blake]{hmm}
+Jien Kato, Toyohide Watanabe, Sebastien Joga, Jens Rittscher, i Andrew Blake.
+\newblock An hmm-based segmentation method for traffic monitoring movies.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 24\penalty0 (9):\penalty0 1291--1296, 2002.
+\newblock ISSN 0162-8828.
+\newblock \doi{http://doi.ieeecomputersociety.org/10.1109/TPAMI.2002.1033221}.
+
+\bibitem[Monnet et~al.(2003)Monnet, Mittal, Paragios, i Ramesh]{MonnetMPR03}
+Antoine Monnet, Anurag Mittal, Nikos Paragios, i Visvanathan Ramesh.
+\newblock Background modeling and subtraction of dynamic scenes.
+\newblock U \emph{ICCV}, stranice 1305--1312, 2003.
+
+\bibitem[Prati et~al.(2003)Prati, Mikic, Trivedi, i
+  Cucchiara]{Prati03detectingmoving}
+Andrea Prati, Ivana Mikic, Mohan~M. Trivedi, i Rita Cucchiara.
+\newblock Detecting moving shadows: Algorithms and evaluation.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 25:\penalty0 918--923, 2003.
+
+\bibitem[Stauffer i Grimson(1999)]{Stauffer}
+Chris Stauffer i W.~Eric~L. Grimson.
+\newblock Adaptive background mixture models for real-time tracking.
+\newblock \emph{In Proceedings CVPR}, stranice 246--252, 1999.
+
+\bibitem[Toyama et~al.(1999)Toyama, Krumm, Brumitt, i Meyers]{ToyamaKBM99}
+Kentaro Toyama, John Krumm, Barry Brumitt, i Brian Meyers.
+\newblock Wallflower: Principles and practice of background maintenance.
+\newblock U \emph{ICCV}, stranice 255--261, 1999.
+
+\bibitem[Withagen et~al.(2002)Withagen, Schutte, i Groen]{WithagenSG02}
+Paul~J. Withagen, Klamer Schutte, i Frans C.~A. Groen.
+\newblock Likelihood-based object detection and object tracking using color
+  histograms and em.
+\newblock U \emph{ICIP (1)}, stranice 589--592, 2002.
+
+\bibitem[Wren et~al.(1997)Wren, Azarbayejani, Darrell, i Pentland]{Wren}
+Christopher Wren, Ali Azarbayejani, Trevor Darrell, i Alex Pentland.
+\newblock Pfinder: Real-time tracking of the human body.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 19:\penalty0 780--785, 1997.
+
+\bibitem[Zivkovic i van~der Heijden(2004)]{ZivkovicH04}
+Zoran Zivkovic i Ferdinand van~der Heijden.
+\newblock Recursive unsupervised learning of finite mixture models.
+\newblock \emph{IEEE Trans. Pattern Anal. Mach. Intell.}, stranice 651--656,
+  2004.
+
+\end{thebibliography}

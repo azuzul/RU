@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,oneside]{report}
+\documentclass[times, utf8, zavrsni]{fer}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -9,9 +9,14 @@
 \usepackage{subfig}
 \usepackage{float}
 \usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage{natbib}
+\pagenumbering{arabic}
 \titleformat{\chapter}[hang] 
 {\centering\fontsize{16}{12}\bfseries}{\chaptertitlename\ \thechapter.}{1em}{}
  \renewcommand{\contentsname}{Sadržaj}
+ \newcommand\given[1][]{\:#1\vert\:}
+ \newcommand*{\estimates}{\mathrel{\hat=}}
 \begin{document}
 
 \begin{titlepage}
@@ -31,7 +36,7 @@
 	%----------------------------------------------------------------------------------------
 	
 	
-	{ \huge \bfseries Oblikovati sustav za video nadzor u zatvorenom prostoru}\\[2cm] % Title of your document
+	{ \huge \bfseries Sustav za video nadzor u zatvorenom prostoru}\\[2cm] % Title of your document
 	
 	
 	%----------------------------------------------------------------------------------------
@@ -66,9 +71,88 @@
 \tableofcontents
 \renewcommand{\chaptername}{}
 \chapter{Projektni zadatak}
+\section{Opis projektnog zadatka}
+Uklanjanje pozadine (engl. background subtraction) je uobičajen problem računalnog vida. Koristi se onda kada je potrebno pohraniti ogromnu količinu podataka (u obliku slika, engl. frame) uz što veću uštedu memorije. Pozadinom smatramo sve statične objekte, odnosno objekte koje smatramo nebitnim podacima za određen problem koji razmatramo. One objekte koje smatramo pozadinom bojimo bijelom bojom, a one koji su dinamični bojimo crnom bojom. Sliku koja se sastoji od piksela, od kojih je svaki predstavljen RGB (engl. red, green and blue color system) komponentama, pojednostavljujemo tako da joj pridjeljujemo samo dvije moguće boje te ćemo kodiranjem dobiti znatno veću uštedu memorijskog prostora. Analiziranje slike obavlja se na razini piksela. Svakom se pikselu dodjeljuje model čiji parametri pripadaju nekoj statističkoj distribuciji. U ovom projektu je razvijen efikasno prilagodljivi algoritam koristeći GMM model (engl. Gaussian Mixture Model)\cite{Stauffer}. Cilj algoritma je detekcija uljeza, odnosno objekata koji nemaju uobičajeno ponašanje u sceni. U ovom slučaju to su dinamični objekti. Detekcija se obavlja tako da se uočavaju dijelovi scene koji ne odgovaraju modelu. Takav proces se naziva uklanjanje pozadine (engl. background subtraction). Statistički model sadrži gustoću razdiobe za svaki piksel. Idući korak je odrediti parametre tih razdioba\cite{Wren}. U ovom projektnom zadatku model GMM koristi Gauss-ovu normalnu razdiobu s parametrima srednje vrijednosti $(\mu)$ i standardne devijacije $(\sigma)$. Model koji za svaki piksel uzima po jednu razdiobu jednostavan je model koji ne daje dobre rezultate. GMM model u ovom projektu za svaki piksel računa parametre za više komponenti čiji se broj dinamički mijenja. Svaka komponenta prikazana je jednom Gaussovom normalnom distribucijom. Ovim možemo zaključiti da se broj parametara prilagođava za svaki piksel.
+ 
+\section{Pregled i opis srodnih rješenja}
+Svaki piksel prikazan je vektorom $\vec{x}$ koji sadrži komponente boja u nekom od odabranih sustava boja (npr. RGB sustav). Uklanjanje pozadine obavlja se tako da za svaki piksel provjeravamo pripada li pozadini (BG - background objects) ili je on dio nekog prednjeg objekta (FG - foreground object).\\Bayseova odluka dana je formulom:
+$$R = \frac{p(BG|\vec{x}^{(t)})}{p(FG|\vec{x}^{(t)})} = \frac{p(\vec{x}^{(t)}|BG)p(BG)}{p(\vec{x}^{(t)}|FG)p(FG)}$$  
+Uklanjanje pozadine koristi se pri praćenju objekata. Kod praćenja ne posjedujemo nikakve informacije o objektima niti koliko će se oni puta pojavljivati u sceni pa zbog toga pretpostavljamo da je $$p(FG) = p(BG).$$ Praćenje objekata može poslužiti za unaprijeđenje uklanjanja pozadine\citep{Harville02aframework, WithagenSG02}. Pretpostavka je i uniformna distribucija za pojavljivanje prednjih objekata (FG - foreground object) $p(\vec{x}^{(t)}|FG) = c_{FG}$. \\ Uzimajući u obzir sve pretpostavke, je li objekt pripada pozadini ili ne modeliramo formulom: $$p(\vec{x}^{(t)}|BG) > c_{trh}(=Rc_{FG}).$$
+Pozadina (BG - background objects) se uči na skupu za treniranje koji se dinamički mijenja sa dolaskom novih slika (engl. frames). Pretpostavka je da su uzorci neovisni i glavni je problem kako efikasno procijeniti gustoću razdiobe te je prilagoditi na moguće izmjene. Jezgreno bazirane gustoće razdiobe korištene su u \cite{Elgammal}, a mi koristimo GMM iz \cite{Stauffer}. Model koji koristi jezgreno bazirane gustoće razdiobe dan je sa formulom: $$Pr(x_t) = \frac{1}{N}\sum_{i=1}^{N}\prod_{j=1}^{d}\frac{1}{\sqrt{2\pi\sigma_j^2}}e^{-\frac{1}{2}\frac{(x_{t_j} - x_{i_j})^2}{\sigma_j^2}}$$ gdje se koristi multivarijantna Gaussova razdioba $N(0, \sum)$ s parametrima $\mu_j$ i $\sigma_j$ i gdje se pretpostavlja dijeljena dijagonalna kovarijacijska matrica. Postoje modeli koji uzimaju vremenski slijed slika kod kojih odluka ovisi o vrijednosti piksela iz prošle slike. Za primjer uzimamo \cite{ToyamaKBM99} i \citep{MonnetMPR03} kod kojih je distribucija modelirana kao autoregresivni proces. Centralna ideja takvih modela je generirati mehanizam za predviđanje koji može odrediti aktualnu sliku (engl. frame) koristeći k zadnjih promatranih slika.\\Matematička formulacija problema je: $$I_{pred}(t) = f(I(t - 1), I(t - 2), ... ,I(t - k))$$ gdje je f funkcija k-tog reda koja se treba izvesti. U \cite{hmm} korišteni su skriveni Markovljevi modeli (engl. HMM - hidden Markov models) kod kojih se podrazumijeva da je modelirani sustav Markovljev proces sa skrivenim stanjima u kojima sa određenom vjerojatnošću emitira bilo koji element iz skupa simbola $T = \{b_1, b_2, ... , b_M\}$. Značajku koju je proces emitirao u trenutku $t$ i stanju $q_t$ označavamo sa $O_t$.\\HMM se može smatrati najjednostavnijom Bayesovom mrežom. 
+\begin{center}
+\includegraphics[scale=0.8]{slike/hmm.png}
+\centering
+\captionof{figure}{Skriveni Markovljev Model(HMM)}
+\end{center}
+Spomenuti modeli su jako spori i teža je prilagodba na promjene u sceni. Mogu se koristiti kao poboljšanje algoritma korištenog u ovom radu. \\
+Druga srodna tema je detekcija sjene objekata. Uz detekciju objekata obično detektiramo i sjenu što je pojašnjeno u \cite{Prati03detectingmoving}. Algoritmi za detektiranje sjene mogu biti formulirani tako da se baziraju na fizikalnim osnovama 
+formulacije sjene. Model za detektiranje sjene dan je formulom: $$s_k(x,y) = E_k(x,y)\rho_k(x,y)$$ gdje je $s_k$ osvijetljenost točke u koordinatama (x,y) u vremenu k, $\rho_k(x,y)$ refleksija površine objekta, a $E_k(x,y)$ količina svjetlosne energije koju je upila površina $S$. 
+\begin{center}
+\includegraphics[scale=0.4]{slike/shadow.png}
+\centering
+\captionof{figure}{Primjer pokretne sjene sa prikazom dijela objekta koji nije osvijetljen (engl. slef-shadow) i onog dijela koji je projiciran na tlo (engl. cast-shadow)}
+\end{center}
+\section{Konceptualno rješenje zadatka}
+U ovom se radu baziramo na GMM modelu (engl. Gaussian Mixture Model)\cite{Stauffer} koji smo koritili za uklanjanje pozadine (BG - background objects). Za svaki piksel smo izračunali GMM model s određenim brojem komponenata koji je parametar modela. Pripada li piksel pozadini ili ne donosimo odlukom $p(\vec{x}^{(t)}|BG) > c_{trh}(=Rc_{FG})$.\\
+Za svaki se model računaju parametri razdiobe za svaku komponentu na temelju skupa za učenje koji je za svaki novi period $T$ različit. Razdioba koja se koristi u GMM modelu je Gaussova normalna razdioba.\\ \\
+\indent U praksi se osjetljivost scene može mijenjati postepeno ili naglo, ovisno o uvjetima okoline. Da bi se prilagodili promjenama moramo osvježavati skup za učenje. Skup za učenje osvježavamo periodom $T$ tako da izbacujemo "najstariji" primjer iz skupa te dodajemo "najnoviji". Tako u početku sve objekte smatramo prednjim objektima FG do nekog trenutka kad odaberemo dovoljan broj primjera za učenje da algoritam može razlučiti ono što je učestalo u sceni, a što nije. Prednji objekti koji se pojavljuju mogu biti statični neko vrijeme pa ih algoritam u nekom trenutku može svrstati u stražnje objekte, odnosno pozadinu. Svaki se piksel obrađuje te boji bijelom bojom ako ne pripada pozadini (sastavni je dio objekta koji se kreće) ili crnom bojom ako pripada pozadini (nije nam bitan jer je uobičajena pojava scene).
+\begin{center}
+\includegraphics[scale=0.5]{slike/pokretni_objekt.png}
+\centering
+\captionof{figure}{Primjer pokretnog objekta u sceni}
+\end{center}
 \chapter{Postupak rješavanja zadatka}
+\section{Primjena GMM modela za odvajanje objekata od pozadine u slici}
+Intenzitet svjetla na slici općenito zavisi od geometrije scene, položaju kamere i same osvijetljenosti scene. Ako pretpostavimo da se u videonadzornom sustavu ne mjenja položaj kamera te se stalno snima ista scena, jedino što može utjecati na promjene inteziteta svjetla u slikama jest osvijetljenost scene. Osvijetljenost scene se u praksi može mijenajti postupno kroz vrijeme ili iznenadno. Postupne se promjene osvijetljenja češće događaju u vanjskim scenama zbog promjene doba dana ili vremenskih prilika. Nagle promjene osvjetljenja u untrašnjim scenama mogu biti rezultat paljenja i gašenja rasvjete u prostoriji. Da bi se model mogao prilagođavati promjenama osvijetljenja u sceni, potrebno je neprestano ažurirati skup za učenje novim informacijama o osvijetljenju, a odbacivati stare. S tim ciljem odabire se  određeni vremenski period $T$, pa u trenutku $t$ na raspolaganju imamo skup uzoraka $X_T$. $$X_T=\{x^{(t)},x^{(t-1)},...,x^{(t-T)}\}$$  
+Odvajanje objekata od pozadine na slici može se promatrati kao klasifikacijski problem u dvije klase od kojih jedna pripada pozadini, a druga objektima. Za svaki piksel slike dakle treba donjeti odluku pripada li pozadini ili nekom od objekata. U tom kontekstu $X_T$ je naš skup za učenje na temelju kojeg se donose klasifikacijske odluke. Model koji se u okviru ovog rada koristi za klasifikaciju je model Gaussove mješavine.
+
+\subsection{Model Gaussove mješavine}
+
+Model mješane gustoće vjerojatnosti općenito modelira se kao linearna kombinacija $M$ gustoća vjerojatnosti:
+$$ p(\vec{x}) = \sum_{m=1}^{M}\pi_{m} p({\vec{x} \given \vec{\theta_{m}}}) $$
+gdje je $\pi_m$ težina komponente $m$, a $\theta_m$ predstavlja parametre konkretne razdiobe. Za težine komponenata vrijedi ograničenje:
+$$\sum_{m=1}^{M}\pi_{m}=1$$ 
+Gaussova mješavima je parametarska funkcija gustoće vjerojatnosti sačinjena od težinskih suma Gaussovih komponenata:
+$$ p(\vec{x})= \sum_{m=1}^{M}\pi_{m} \mathcal{N}({\vec{x} \given \vec{\mu}_m,\Sigma_m}) $$
+gdje su $\vec{\mu}_m$ i {$\mathbf{\Sigma}_m$ vektor očekivanja i kovarijancijska matrica m-te Gaussove razdiobe. Postoji više varijanti GMM-a u kojima kovarijancijske matrice mogu biti punog ranga ili dijagonalne, a parametri se mogu dijeliti ili vezati između Gaussovih komponenata. Izbor odgovarajuće varijante ovisi o količini dostupnih podataka za treniranje. U okviru ovog projekta koristi se diagonalna kovarijacijska matrica. Vrijedi:
+$$\Sigma_m=\sigma_m^2 I$$
+Parametri Gaussovih razdioba dobiveni su kao statističke procjene nad skupom uzoraka pa je ispravnije pisati:
+$$ \hat p(\vec{x} \given X_t)= \sum_{m=1}^{M}\hat\pi_{m} \mathcal{N}({\vec{x} \given \hat{\vec{\mu}}_m,\hat\sigma_m^2 I}) $$	
+Kad god na raspolaganju imamo novi primjer za učenje, on se ubacuje u skup za učenje na mjesto najstarijeg primjera. S obzirom da se skup za učenje promjenio potrebno je ponovo procijeniti sve parametre razdioba i vrijednost funkcije $ p(\vec{x} \given X_t)$. Osim toga, provode se i sljedeće rekurzivne jednadžbe:
+$$ \hat \pi_m \leftarrow \hat \pi_m +\alpha(o_m^{(t)}-\hat \pi_m) $$
+$$ \hat{\vec{\mu}}_m \leftarrow \hat{\vec{\mu}}_m +o_m^{(t)}(\alpha / \hat \pi_m )\vec{\delta}_m $$
+$$\hat\sigma_m^2\leftarrow \hat\sigma_m^2 +o_m^{(t)}(\alpha / \hat \pi_m )(\vec{\delta}^T_m\vec{\delta}_m-\hat\sigma_m^2)$$	
+gdje je $\vec{\delta}_m=\vec x^{(t)}-\hat{\vec{\mu}}_m$ razlika između primjera i srednje vrijednosti razdiobe. Umjesto već spomenutog vremenskog intervala $T$ ovdje je uvedena konstanta $\alpha=1/T$ koja ograničava utjecaj starijih informacija. Za novi primjer pripadnost $o_m^{(t)}$ je jednaka jedinici za komponentu $m$ koja je u blizini tog primjera te ima najveću važnost odnosno težinu $\hat\pi_m$. Za sve ostale komponente vrijedi $o_m^{(t)}=0$. Definiramo da je primjer blizu komponenti $m$ ukoliko je njegova Mahalanobisova udaljenost od nje primjerice manja od $3\hat\sigma_m$. Kvadratna udaljenost primjera od komponente $m$ računa se  kao $$D_m^2(\vec x^{(t)}) = \vec{\delta}^T_m \vec{\delta}_m/ \hat\sigma_m^2$$	Ukoliko primjer nije blizu nijedne komponente od njih $M$ generira se nova komponenta sa parametrima:	$$\hat\pi_{M+1}=\alpha$$
+$$\hat{\vec{\mu}}_{M+1}=\vec x^{(t)}$$	$$\hat{\sigma}_{M+1}=\sigma_0$$
+Ako je dostignut maksimalan broj komponenti odbacuje se komponenta s najmanjom težinom $\hat\pi_m$.
+	
+Ovaj algoritam predstavlja on-line algoritam grupiranja. Tipično će objeki koji ne pripadaju pozadini biti reprezentirani dodatnim grupama sa malim težinama $\hat\pi_m$ Uzimajući to u obzir možemo aproksimirati model pozadine sa B najvećih grupa:
+	
+$$ \hat p(\vec{x} \given {X_t,BG}) \approx \sum_{m=1}^{B}\hat\pi_{m} \mathcal{N}({\vec{x} \given \hat{\vec{\mu}}_m,\hat\sigma_m^2 I}) $$
+Ako su komponente sortitane po padajućim vrijednostima težina  $\hat\pi_m$ imamo:
+$$B=\underset{b}{\mathrm{argmin}}(\sum_{m=1}^{b}{\hat\pi}_m>(1-c_f))$$
+gdje je $c_f$ mjera maksimalnog udjela piksela koji mogu pripadati prednjem dijelu slike bez utjecaja na model pozadine.
+
+Dođe li novi objekt u scenu i ostane statičan neko vrijeme, vjerojatno će generirati novi stabilni klaster. Kako je stara pozadina sada zaklonjena tim objektom, težina njegovog klastera $\pi_{B+1}$ će se konstantno povećavati. Ukoliko taj objekt ostane statičan dovoljno dugo, njegova će težina postati veća od $c_f$ i smatrat će se dijelom pozadine.
+
+\subsection{Biranje broja komponenti}
+
+Težina $ \pi_m $ opisuje koliko podataka pripada $ m $-toj komponenti GMM-a. To možemo promatrati kao vjerojatnost da uzorak dolazi iz $ m $-te komponente, a u ovom slučaju $ \pi_m $ predstavlja osnovnu multinomijalnu distribuciju. Pretpostavimo da imamo skup koji sadrži $ t $ uzoraka od kojih svaki pripada jednoj komponenti GMM-a. Također pretpostavimo da je broj uzoraka koji pripadaju $ m $-toj komponenti jednak:
+$$ n_m = \sum_{i=1}^{t} o_{m}^{(i)} $$ Za $ n_m $-ove pretpostavljamo da se ponašaju prema kategoričkoj ("multinomijalnoj") distribuciji opisanu sljedećom funkcijom izglednosti: $$ \mathcal{L}=\prod_{m=1}^{M} \pi_{m}^{n_m} $$ Za izračun maksimalne izglednosti (engl. \textit{Maximum Likelihood (ML)}) koristimo sljedeću formulu : $$ \frac{\partial }{\partial \hat{\pi}_m}\left( log\mathcal{L} + \lambda ( \sum_{m=1}^{M} \hat{\pi}_m - 1 ) \right) = 0 $$ Nakon rješavanja po $ \lambda $ dobijemo izraz: $$ \hat{\pi}_m^{(t)}=\frac{n_m}{t}=\frac{1}{t}\sum_{i=1}^{t}o_m^{(i)} $$
+
+$\hat{\pi}_m^{(t)}$ označava procjenu iz $ t $ uzoraka. Izraz se može napisati rekurzivno kao funkcija procjene $\hat{\pi}_m^{(t-1)}$ za $ t - 1 $ uzorak i pripadnosti $ o_m^{(t)} $ posljednjeg uzorka: $$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t} (o_m^{(t)} - \hat{ \pi}_m^{(t-1)}) $$ Sada možemo vidjeti ako fiksiramo $ \frac{1}{t} $ na $ \alpha = \frac{1}{T} $ dobiti ćemo jednadžbu za popravljanje parametra $ \hat{\pi}_m^{(t)} $ iz prethodne točke. 
+\begin{dmath}
+	$$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t} (o_m^{(t)}-\hat{\pi}_m^{(t-1)}) = \hat{\pi}_m^{(t-1)} + \frac{1}{T} (o_m^{(t)}-\hat{\pi}_m^{(t-1)}) = \hat{\pi}_m^{(t-1)} + \alpha (o_m^{(t)}-\hat{\pi}_m^{(t-1)}) $$ 
+\end{dmath}
+Fiksiranje utjecaja novog uzorka znači da se više pouzdamo u novi uzorak, a doprinos starih uzoraka se eksponencijalno smanjuje. 
+
+Apriorno znanje za kategoričku distribuciju možemo prikazati koristeći konjugatni par, tj. Dirichlet-ov aprior: $$ \mathcal{P}=\prod_{m=1}^{M} \pi_m^{c_m} $$ Koeficijenti $ c_m $ predstavljaju apriorno znanje ( u MAP(engl. \textit{Maximum a posteriori}) smislu ) za razred $ m $, tj. broj broj uzoraka koji pripadaju tom razredu apriorno. Koristimo negativne koeficijente $ c_m = -c $ po uzoru na \cite{ZivkovicH04}. Negativno apriorno znanje nam osigurava da razred prihvaćamo samo ako imamo dovoljeno dokaza iz podataka da taj razred zaista postoji. MAP izraz koji smo spomenuli uključuje apriorno znanje i definiran je sljedećim izrazom: $$ \frac{\partial }{\partial \hat{\pi}_m}\left( log\mathcal{L} +log \mathcal{P}  + \lambda ( \sum_{m=1}^{M} \hat{\pi}_m - 1 ) \right) = 0 $$
+$$ \frac{\partial }{\partial \hat{\pi}_m}\left( log\mathcal{L} +log \prod_{m=1}^{M} \pi_m^{-c} + \lambda ( \sum_{m=1}^{M} \hat{\pi}_m - 1 ) \right) = 0 $$ Nakon izračuna dobijemo sljedeće: $$ \hat{\pi}_m^{(t)}=\frac{1}{K}\sum_{i=1}^{t}\left(o_m^{(i)}-c\right) $$ gdje nam je $ K $ definiran formulom: $$ K = \sum_{m=1}^{M}\left(\sum_{i=1}^{t}o_m^{(i)}-c\right)=t-Mc $$ Uvrstiviši ovaj izraz u prethodnu formulu dobijemo : $$ \hat{\pi}_m^{(t)}=\frac{\hat{\prod}_m-\frac{c}{t}}{1-\frac{Mc}{t}} $$ gdje $ \hat{\prod}_m = \frac{1}{t} \sum_{i=1}^{t} o_m^{(t)} $ predstavlja  ML procjenu, a pristranost (engl. \textit{bias}) iz apriora predstavljen je kao $ c/t $. Pristranost se smanjue se povećenjem veličine skupa za učenje, tj. za velike vrijednosti $ t $. U slučaju prihvatljivosti male vrijednosti pristranosti možemo je fiksirati tako da izraz $ c/t $ napišemo kao $ c_T =c/T $ s nekim velikim $ T $. Ovim smo pretpostavili da je pristranost uvijek jednaka i da iznosi kao kada imamo skup s $ T $ uzoraka. Sada možemo napisati još pojednostavljeniju formulu za korekciju težina $ \hat{\pi}_m $ s postavljenim $ c/t = c_T $ : $$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t} \left(\frac{o_m^{(t)}}{1-Mc_T}-\hat{\pi}_m^{(t-1)}\right) -\frac{1}{t}\frac{c_T}{1-Mc_T} $$ Sada možemo ići još korak dalje. Pošto znamo da nam $ M $ predstavlja broj komponenti koji je najčešće mali pozitivan broj, te također $ c_T $ je najčešće mali decimalni broj. Što znači da je njihov umnožak također vrlo mali decimalni broj pa onda možemo uvesti još slijedeće pojednostavljenje: $ 1 - Mc_T \approx 1$. Čime možemo pojednostaviti dalje prethodnu formulu u : $$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t} \left(o_m^{(t)}-\hat{\pi}_m^{(t-1)}\right) -\frac{1}{t}c_T $$ Ako sada još uvedemo $ \alpha $-u koja je definirana kako je prije opsiano, dobivamo sljedeći izraz za korekciju težina: $$ \hat \pi_m \leftarrow \hat \pi_m +\alpha(o_m^{(t)}-\hat \pi_m) - \alpha c_T$$ Koristiti ćemo ovu jednadžbu za korekcije. Nakon svake korekcije moramo raditi normalizaciju tako da suma $ \pi_m $-ova bude jednaka jedan. Zapičinjemo postupak tako da jednu komponentu GMM-a centriramo na prvi uzorak i nakon toga nove komponente se dodaju kako je opisano u prethodnom podnaslovu. Dirichlet-ovo apriori s negativnim težinama prigušiti će komponente koje nisu sadržane u podatcima i komponentu $ m $ odbacujemo kada njena težina $ \pi_m $ poprimi negativnu vrijednost. Ovime osiguravamo da težine mješavina uvijek ostaju pozivine vrijednosti. 
+
+Treba još primjetiti da korištenje $$ \hat{\pi}_m^{(t)} = \hat{\pi}_m^{(t-1)} + \frac{1}{t-Mc_T} (o_m^{(t)} - \hat{ \pi}_m^{(t-1)}) $$ nije previše korisno. Ako počnemo s velikom vrijednosti $ t $ tada izbjegavamo negativne popravke koji se događaju za malu vrijednost parametra $ t $, ali također gubimo utjecaj i apriornog znanja. Ovo nam predstavlja opravdanje zbog kojeg smo fiksirali utjecaj apriornog znanja.
 \chapter{Ispitivanje rješenja}
 \chapter{Opis programske implementacije rješenja}
 \chapter{Zaključak}
-\chapter{Literatura}
+\bibliography{literatura}
+\bibliographystyle{fer}
 \end{document}
