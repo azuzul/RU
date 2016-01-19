@@ -4,112 +4,26 @@
 #include <unistd.h>
 #include <iostream>
 
-Player::Node* Player::Create_Node(double info1, double info2, double info3)
-{
-    N_ptr = new Node;
-    if(N_ptr != NULL)
-    {
-        N_ptr->Next = NULL;
-        N_ptr->no_of_components = 1;
-        N_ptr->pixel_s = N_ptr->pixel_r = Create_gaussian(info1,info2, info3);
-    }
-    return N_ptr;
-}
-
-Player::gaussian* Player::Create_gaussian(double info1, double info2, double info3)
-{
-    ptr = new gaussian;
-    if(ptr != NULL)
-    {
-        ptr->mean[0] = info1;
-        ptr->mean[1] = info2;
-        ptr->mean[2] = info3;
-        ptr->covariance = covariance0;
-        ptr->weight = alpha;
-        ptr->Next = NULL;
-        ptr->Previous = NULL;
-    }
-    return ptr;
-}
-
-void Player::Insert_End_Node(Node* np)
-{
-    if( N_start != NULL )
-    {
-        N_rear->Next = np;
-        N_rear = np;
-    }
-    else
-        N_start = N_rear = np;
-}
-
-void Player::Insert_End_gaussian(Player::gaussian* nptr)
-{
-    if(start_gmm != NULL)
-    {
-        rear->Next = nptr;
-        nptr->Previous = rear;
-        rear = nptr;
-    }
-    else
-        start_gmm = rear = nptr;
-}
-
-Player::gaussian* Player::Delete_gaussian(Player::gaussian* nptr)
-{
-    previous = nptr->Previous;
-    next = nptr->Next;
-    if(start_gmm != NULL)
-    {
-        if(nptr == start_gmm && nptr == rear)
-        {
-            start_gmm = rear = NULL;
-            delete nptr;
-        }
-        else if(nptr == start_gmm)
-        {
-            next->Previous = NULL;
-            start_gmm = next;
-            delete nptr;
-            nptr = start_gmm;
-        }
-        else if(nptr == rear)
-        {
-            previous->Next = NULL;
-            rear = previous;
-            delete nptr;
-            nptr = rear;
-        }
-        else
-        {
-            previous->Next = next;
-            next->Previous = previous;
-            delete nptr;
-            nptr = next;
-        }
-    }
-    else
-    {
-        waitKey(0);
-        exit(0);
-    }
-    return nptr;
-}
-
-Player::Player(QObject *parent,int video)
+Player::Player(QObject *parent,int video, double alpha, double cT, double covariance0, double cf, int frameRate)
     : QThread(parent)
 {
     stop = true;
     this->video=video;
+
+    this->alpha = alpha;
+    this->cT = cT;
+    this->covariance0 = covariance0;
+    this->cf = cf;
+    this->frameRate = frameRate;
 }
 
 bool Player::loadVideo(string filename){
 
-    if(video == 0) {
-        capture.open(0);
-    } else {
+//    if(video == 0) {
+//        capture.open(0);
+//    } else {
         capture.open(filename);
-    }
+//    }
     if(capture.isOpened()){
         frameRate = (int)capture.get(CV_CAP_PROP_FPS);
         return true;
@@ -128,9 +42,10 @@ void Player::Play(){
 
 void Player::run()
 {
-    frameRate = 30;
-    int delay = (1000/frameRate);
-    std::cout << frameRate << std::endl;
+//    frameRate = 30;
+//    int delay = (1000/frameRate);
+//    std::cout << frameRate << std::endl;
+
     gmm();
 }
 
@@ -162,8 +77,16 @@ void Player::gmm() {
     int i,j,k;
     i=j=k=0;
 
-    frameRate = 30;
-    int delay = (1000/frameRate);
+    GMM gmm(this->alpha, this->cT, this->covariance0, this->cf);
+
+    std::cout << "Parametar alpha: " << gmm.alpha << std::endl;
+    std::cout << "Parametar cT: " << gmm.cT << std::endl;
+    std::cout << "Parametar covariance0: " << gmm.covariance0 << std::endl;
+    std::cout << "Parametar cF: " << gmm.cf << std::endl;
+
+
+    int delay = (1000/this->frameRate);
+    //    std::cout << frameRate << std::endl;
 
     // Declare matrices to store original and resultant binary image
     cv::Mat orig_img, bin_img;
@@ -193,10 +116,10 @@ void Player::gmm() {
         for(int asf=0; asf<orig_img.cols; asf++ )
         {
 
-            N_ptr = Create_Node(*r_ptr,*(r_ptr+1),*(r_ptr+2));
-            if( N_ptr != NULL ){
-                N_ptr->pixel_s->weight = 1.0;
-                Insert_End_Node(N_ptr);
+            gmm.N_ptr = gmm.Create_Node(*r_ptr,*(r_ptr+1),*(r_ptr+2));
+            if( gmm.N_ptr != NULL ){
+                gmm.N_ptr->pixel_s->weight = 1.0;
+                gmm.Insert_End_Node(gmm.N_ptr);
             }
             else
             {
@@ -248,7 +171,7 @@ void Player::gmm() {
         }
         int count = 0;
 
-        N_ptr = N_start;
+        gmm.N_ptr = gmm.N_start;
         duration = static_cast<double>(cv::getTickCount());
         for( i=0; i<nL; i++)
         {
@@ -266,39 +189,39 @@ void Player::gmm() {
                 gVal = *(r_ptr++);
                 bVal = *(r_ptr++);
 
-                start_gmm = N_ptr->pixel_s;
-                rear = N_ptr->pixel_r;
-                ptr = start_gmm;
+                gmm.start_gmm = gmm.N_ptr->pixel_s;
+                gmm.rear = gmm.N_ptr->pixel_r;
+                gmm.ptr = gmm.start_gmm;
 
-                temp_ptr = NULL;
+                gmm.temp_ptr = NULL;
 
-                if(N_ptr->no_of_components > 4)
+                if(gmm.N_ptr->no_of_components > 4)
                 {
-                    Delete_gaussian(rear);
-                    N_ptr->no_of_components--;
+                    gmm.Delete_gaussian(gmm.rear);
+                    gmm.N_ptr->no_of_components--;
                 }
 
-                for( k=0; k<N_ptr->no_of_components; k++ )
+                for( k=0; k<gmm.N_ptr->no_of_components; k++ )
                 {
 
 
-                    weight = ptr->weight;
+                    weight = gmm.ptr->weight;
                     mult = alpha/weight;
-                    weight = weight*alpha_bar + prune;
+                    weight = weight*gmm.alpha_bar + gmm.prune;
                     if(close == false)
                     {
-                        muR = ptr->mean[0];
-                        muG = ptr->mean[1];
-                        muB = ptr->mean[2];
+                        muR = gmm.ptr->mean[0];
+                        muG = gmm.ptr->mean[1];
+                        muB = gmm.ptr->mean[2];
 
                         dR = rVal - muR;
                         dG = gVal - muG;
                         dB = bVal - muB;
 
-                        var = ptr->covariance;
+                        var = gmm.ptr->covariance;
                         mal_dist = (dR*dR + dG*dG + dB*dB);
 
-                        if((sum < cfbar) && (mal_dist < 16.0*var*var))
+                        if((sum < gmm.cfbar) && (mal_dist < 16.0*var*var))
                             background = 255;
 
                         if( mal_dist < 9.0*var*var)
@@ -306,89 +229,89 @@ void Player::gmm() {
                             weight += alpha;
                             close = true;
 
-                            ptr->mean[0] = muR + mult*dR;
-                            ptr->mean[1] = muG + mult*dG;
-                            ptr->mean[2] = muB + mult*dB;
+                            gmm.ptr->mean[0] = muR + mult*dR;
+                            gmm.ptr->mean[1] = muG + mult*dG;
+                            gmm.ptr->mean[2] = muB + mult*dB;
 
                             temp_cov = var + mult*(mal_dist - var);
-                            ptr->covariance = temp_cov<5.0?5.0:(temp_cov>20.0?20.0:temp_cov);
-                            temp_ptr = ptr;
+                            gmm.ptr->covariance = temp_cov<5.0?5.0:(temp_cov>20.0?20.0:temp_cov);
+                            gmm.temp_ptr = gmm.ptr;
                         }
                     }
 
-                    if(weight < -prune)
+                    if(weight < -gmm.prune)
                     {
-                        ptr = Delete_gaussian(ptr);
+                        gmm.ptr = gmm.Delete_gaussian(gmm.ptr);
                         weight = 0;
-                        N_ptr->no_of_components--;
+                        gmm.N_ptr->no_of_components--;
                     }
                     else
                     {
                         sum += weight;
-                        ptr->weight = weight;
+                        gmm.ptr->weight = weight;
                     }
 
-                    ptr = ptr->Next;
+                    gmm.ptr = gmm.ptr->Next;
                 }
 
                 if( close == false )
                 {
-                    ptr = new gaussian;
-                    ptr->weight = alpha;
-                    ptr->mean[0] = rVal;
-                    ptr->mean[1] = gVal;
-                    ptr->mean[2] = bVal;
-                    ptr->covariance = covariance0;
-                    ptr->Next = NULL;
-                    ptr->Previous = NULL;
-                    if(start_gmm == NULL)
-                        start_gmm = rear = NULL;
+                    gmm.ptr = new GMM::gaussian;
+                    gmm.ptr->weight = alpha;
+                    gmm.ptr->mean[0] = rVal;
+                    gmm.ptr->mean[1] = gVal;
+                    gmm.ptr->mean[2] = bVal;
+                    gmm.ptr->covariance = covariance0;
+                    gmm.ptr->Next = NULL;
+                    gmm.ptr->Previous = NULL;
+                    if(gmm.start_gmm == NULL)
+                        gmm.start_gmm = gmm.rear = NULL;
                     else
                     {
-                        ptr->Previous = rear;
-                        rear->Next = ptr;
-                        rear = ptr;
+                        gmm.ptr->Previous = gmm.rear;
+                        gmm.rear->Next = gmm.ptr;
+                        gmm.rear = gmm.ptr;
                     }
-                    temp_ptr = ptr;
-                    N_ptr->no_of_components++;
+                    gmm.temp_ptr = gmm.ptr;
+                    gmm.N_ptr->no_of_components++;
                 }
 
-                ptr = start_gmm;
-                while( ptr != NULL)
+                gmm.ptr = gmm.start_gmm;
+                while( gmm.ptr != NULL)
                 {
-                    ptr->weight /= sum;
-                    ptr = ptr->Next;
+                    gmm.ptr->weight /= sum;
+                    gmm.ptr = gmm.ptr->Next;
                 }
 
-                while(temp_ptr != NULL && temp_ptr->Previous != NULL)
+                while(gmm.temp_ptr != NULL && gmm.temp_ptr->Previous != NULL)
                 {
-                    if(temp_ptr->weight <= temp_ptr->Previous->weight)
+                    if(gmm.temp_ptr->weight <= gmm.temp_ptr->Previous->weight)
                         break;
                     else
                     {
-                        next = temp_ptr->Next;
-                        previous = temp_ptr->Previous;
-                        if(start_gmm == previous)
-                            start_gmm = temp_ptr;
-                        previous->Next = next;
-                        temp_ptr->Previous = previous->Previous;
-                        temp_ptr->Next = previous;
-                        if(previous->Previous != NULL)
-                            previous->Previous->Next = temp_ptr;
-                        if(next != NULL)
-                            next->Previous = previous;
+                        gmm.next = gmm.temp_ptr->Next;
+                        gmm.previous = gmm.temp_ptr->Previous;
+                        if(gmm.start_gmm == gmm.previous)
+                            gmm.start_gmm = gmm.temp_ptr;
+                        gmm.previous->Next = gmm.next;
+                        gmm.temp_ptr->Previous = gmm.previous->Previous;
+                        gmm.temp_ptr->Next = gmm.previous;
+                        if(gmm.previous->Previous != NULL)
+                            gmm.previous->Previous->Next = gmm.temp_ptr;
+                        if(gmm.next != NULL)
+                            gmm.next->Previous = gmm.previous;
                         else
-                            rear = previous;
-                        previous->Previous = temp_ptr;
+                            gmm.rear = gmm.previous;
+                        gmm.previous->Previous = gmm.temp_ptr;
                     }
 
-                    temp_ptr = temp_ptr->Previous;
+                    gmm.temp_ptr = gmm.temp_ptr->Previous;
                 }
 
-                N_ptr->pixel_s = start_gmm;
-                N_ptr->pixel_r = rear;
+                gmm.N_ptr->pixel_s = gmm.start_gmm;
+                gmm.N_ptr->pixel_r = gmm.rear;
                 *b_ptr++ = background;
-                N_ptr = N_ptr->Next;
+                gmm.N_ptr = gmm.N_ptr->Next;
             }
         }
 
