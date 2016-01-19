@@ -71,12 +71,14 @@ void MainWindow::on_pushButton_2_clicked()
 {
     myPlayer->alpha = ui->param_alpha->text().toDouble();
     myPlayer->cT = ui->param_cT->text().toDouble();
-    myPlayer->covariance0 = ui->param_covariance0->text().toDouble();
+    //myPlayer->covariance0 = ui->param_covariance0->text().toDouble();
+    myPlayer->covariance0 = 11.0;
     myPlayer->cf = ui->param_cF->text().toDouble();
 
     myPlayer1->alpha = ui->param_alpha->text().toDouble();
     myPlayer1->cT = ui->param_cT->text().toDouble();
-    myPlayer1->covariance0 = ui->param_covariance0->text().toDouble();
+    //myPlayer1->covariance0 = ui->param_covariance0->text().toDouble();
+    myPlayer1->covariance0 = 11.0;
     myPlayer1->cf = ui->param_cF->text().toDouble();
 
     if (myPlayer->isStopped())

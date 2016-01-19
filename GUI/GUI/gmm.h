@@ -10,7 +10,7 @@ class GMM
 {       
 public:
     //Some constants for the algorithm
-    const double pi = 3.142;
+    double pi = 3.142;
     double alpha;
     double cT;
     double covariance0;
