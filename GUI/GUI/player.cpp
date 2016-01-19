@@ -19,13 +19,17 @@ Player::Player(QObject *parent,int video, double alpha, double cT, double covari
     gmm = GMM(this->alpha, this->cT, this->covariance0, this->cf);
 }
 
-bool Player::loadVideo(string filename){
+bool Player::loadVideo(int videoInput){
+    capture.open(videoInput);
+    if(capture.isOpened()){
+        frameRate = (int)capture.get(CV_CAP_PROP_FPS);
+        return true;
+    }
+    return false;
+}
 
-//    if(video == 0) {
-//        capture.open(0);
-//    } else {
-        capture.open(filename);
-//    }
+bool Player::loadVideo(string filename){
+    capture.open(filename);
     if(capture.isOpened()){
         frameRate = (int)capture.get(CV_CAP_PROP_FPS);
         return true;

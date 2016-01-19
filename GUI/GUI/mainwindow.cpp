@@ -59,11 +59,20 @@ void MainWindow::on_pushButton_clicked()
             msgBox.exec();
         }
 
-        if (!myPlayer1->loadVideo(filenames[1].toLatin1().data()))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The selected video could not be opened!");
-            msgBox.exec();
+        if(filenames.size() < 1) {
+            if (!myPlayer1->loadVideo(0))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The selected video could not be opened!");
+                msgBox.exec();
+            }
+        } else {
+            if (!myPlayer1->loadVideo(filenames[1].toLatin1().data()))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The selected video could not be opened!");
+                msgBox.exec();
+            }
         }
     }
 }
