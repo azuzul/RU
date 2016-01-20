@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.1.16)  19 JAN 2016 11:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.1.16)  20 JAN 2016 16:53
 entering extended mode
 **./dokumentacija.tex
 (dokumentacija.tex
@@ -1002,29 +1002,51 @@ $$[]$ \OT1/cmr/m/n/12 = [] |  + [](\OML/cmm/m/it/12 o[] |  \OMS/cmsy/m/n/12   [
  3.
 [16
 
-]
+] <images/people.jpg, id=67, 286.06876pt x 160.34906pt>
+File: images/people.jpg Graphic file (type jpg)
+
+<use images/people.jpg>
+Package pdftex.def Info: images/people.jpg used on input line 179.
+(pdftex.def)             Requested size: 286.06805pt x 160.34866pt.
+ <images/gass.jpg, id=68, 286.06876pt x 160.34906pt>
+File: images/gass.jpg Graphic file (type jpg)
+
+<use images/gass.jpg>
+Package pdftex.def Info: images/gass.jpg used on input line 187.
+(pdftex.def)             Requested size: 286.06805pt x 160.34866pt.
+ <images/car.jpg, id=69, 286.06876pt x 160.34906pt>
+File: images/car.jpg Graphic file (type jpg)
+
+<use images/car.jpg>
+Package pdftex.def Info: images/car.jpg used on input line 196.
+(pdftex.def)             Requested size: 286.06805pt x 160.34866pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[17 <./images/people.jpg> <./images/gass.jpg>] [18 <./images/car.jpg>] [19]
  4.
-[17
+[20
 
 ]
  5.
-(dokumentacija.bbl [18
+(dokumentacija.bbl [21
 
-] [19
+] [22
 
-]) [20] (dokumentacija.aux) )
+]) [23] (dokumentacija.aux) )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 117 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 13139 strings out of 493634
- 221869 string characters out of 3135239
+ 13156 strings out of 493634
+ 222146 string characters out of 3135239
  267123 words of memory out of 3000000
- 16363 multiletter control sequences out of 15000+200000
+ 16375 multiletter control sequences out of 15000+200000
  65887 words of font info for 69 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 43i,5n,40p,10387b,349s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,5n,40p,10387b,418s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvi
 ps/fontname/8r.enc}<C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Flige/AppData/Local/Programs/MiKTeX 2
@@ -1043,9 +1065,9 @@ sers/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><
 C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.p
 fb><C:/Users/Flige/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/urw/times/utmr
 i8a.pfb>
-Output written on dokumentacija.pdf (18 pages, 656772 bytes).
+Output written on dokumentacija.pdf (21 pages, 726549 bytes).
 PDF statistics:
- 124 PDF objects out of 1000 (max. 8388607)
+ 137 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -159,16 +159,53 @@ U ovom projektu su za ispitne podatke korišteni videi. Izabrana su tri videa:
 \item video sa malim brojem pokreta u sceni(čovjek na benzinskoj stanici)
 \end{enumerate}
 
-Osim videa, za testiranje u realnom vremenu isprobavali smo i direktno snimanje sa web-kamere.
-
 Zbog ograničenih mogućnosti računalnog sklopovlja, svi videi (odnosno ulazi podaci iz kamere) su smanjene rezolucije (npr. 380x300). Korišteni algoritam za svaki piksel izgrađuje model s više komponenti, stoga za slike s manjom rezolucijom potrebno je izgraditi manje modela, što u konačnici rezultira bržim izvođenjem algoritma (složenost je $O(N^2)$). 
+
+Osim videa, za testiranje u realnom vremenu isprobavali smo i direktno snimanje sa kamere. Aplikacija kao i za video, stvara skup za učenje prvih par slika i zatim obrađuje nadolazeće slike i uspješno određuje koji su pikseli pozadinski, a koji pripadaju objektima u sceni.
 
 Skup za učenje ovog algoritma je ovisan o trenutku u kojem se nalazimo, tj. neki određeni broj slika koji su bili prije slike koja se trenutno prikazuje. Odabiremo period $T$ i za neko vrijeme $t$ imamo sljedeći skup za učenje: $\chi^T = \{ x^{(t)}, x^{(t-1)}, ..., x^{(t-T)} \}$
 
 \section{Rezultati učenja i ispitavanja}
 
+U navedenim videima smo imali različita potrebna vremena za procesiranje neke slike u nizu, ovisno o broju pokreta koji su bili prisutni u videu.
 
+U prvom videu s velikim brojem pokreta (slika 3.1) je potrebno najmanji dio vremena za procesiranje statičnih dijelova scene. Stoga, vrijeme obrade slike je također kratko, u prosjeku 0.017 ms po slici. Za razliku od prvog videa, u drugom je bio umjeren broj pokreta (slika 3.2). Na benzinskoj stanici prilazi čovjek svojem autu, te je jedine pokrete u videu ostvarivao čovjek. Zbog toga je i malo veće vrijeme obrađivanja svake slike u nizu, u prosjeku 0.021 ms po slici. Posljednji video, prolazak jednog auta u ulici sadržavao je vrlo malo pokreta, a pokreti koji su se dogodili, bili su kratkog trajanja (Slika 3.3). U vrlo statičnoj sceni vrijeme procesiranja slike je nešto veće, približno 0.026 ms prosječno. 
+
+
+
+\begin{figure}[h]
+\begin{center}
+\caption{Scena s velikim brojem pokreta}
+\includegraphics{images/people}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[h]
+\begin{center}
+\caption{Scena s umjerenim brojem pokreta}
+\includegraphics{images/gass}
+\end{center}
+\end{figure}
+
+
+
+\begin{figure}[h]
+\begin{center}
+\caption{Scena s malim brojem pokreta}
+\includegraphics{images/car}
+\end{center}
+\end{figure}
+
+Također aplikacija je testirana i u realnom vremenu, odnosno slike su se čitale direktno s kamere. Naravno kao i za video, vrijeme obrade slike ovisi o broju statičnih dijelova scene. U scenama u kojima se snimaju 1-2 osobe prosječno vrijeme obrade slike je 0.022 ms. Povećanjem broja pokretnih objekata u sceni smanjuje se vrijeme obrade. Kamera korištena pri obradi slike u realnom vremenu je Manta g033 gigaE standard, koja omogućava do 88 FPS(Frame Per Second, odnosno broj slika u sekundi koje kamera može slikati). Veličina ćelijica je 9.9 nm, a rezolucija je 656x492. Kamera s ovim specifikacijama je omogućila veću otpornost na šum pri snimanju, odnosno kvalitetnije slike. To znači da će "na oko" statične scene doživljavati male promjene boje po pikselima.
+ 
 \section{Analiza Rezultata}
+
+Napravljena aplikacija vrlo dobro određuje statične dijelove scene kao što je i demonstrirano na slikama. Općenito, broj pokreta u sceni određuje koliko je vremenski zahtjevna obrada te scene. U vrlo dinamičnim scenama, pogotovo koje sadrže vrlo malo statičnih dijelova, brzina obrade slike je velika. To je posljedica načina rada algoritma, jer algoritam pri usporedbi s prošlim slikama nailazi na velike razlike u vrijednostima piksela. Za video gdje su scene prilično statične, potrebno vrijeme procesiranja je veće, zbog toga što algoritam treba obaviti složenije računske operacije, kako bi ustvrdio da piksel ne prelazi graničnu vrijednost, da bi se piksel smatrao da pripada nekom od prednjih objekata u sceni.
+
+U scenama gdje objekti ulaze scenu i potom ostaju nepomični, ti se objekti smatraju pozadinski, to jest stapaju se sa pozadinom. To može biti željeni i neželjeni efekt, no na takve situacije je nemoguće programski utjecati s ovakvim pristupom rješavanja ovog problema. Također problem pri radu ovog algoritma su objekti kojima su neki dijelovi pokretni, a neki su nepokretni. Primjerice čovjek koji pri razgovoru gestikulira rukama, dok ostali dijelovi tijela su nepomični. U tom slučaju program ne razaznaje da je ruka dio većeg objekta, pa se na ekranu za iscrtavanje slika bez pozadine iscrtava samo ruka, i naravno ako je kamera kojom je snimljen video veće kvalitete, iscrtaju se još poneki dijelovi tijela. 
+
+Veliku ulogu igra i kamera kojom se snima video za obradu. Veća kvaliteta kamere daje manja odstupanja po pikselima i na kraju bolje rezultate rada aplikacije. Na primjer, obična web kamera daje mutne slike, zatim se i objekt brže stopi s okolinom, ako objekt postaje statičan u sceni. Zato korištenje kamere s boljom kvalitetom mogu pomoći napravljenoj aplikaciji da detektira objekte koji se vrlo malo gibaju, kao na primjer lišće na laganom povjetarcu.
 
 \chapter{Opis programske implementacije rješenja}
 \chapter{Zaključak}
