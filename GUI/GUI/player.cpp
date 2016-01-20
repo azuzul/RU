@@ -21,6 +21,7 @@ Player::Player(QObject *parent,int video, double alpha, double cT, double covari
 
 bool Player::loadVideo(int videoInput){
     capture.open(videoInput);
+
     if(capture.isOpened()){
         frameRate = (int)capture.get(CV_CAP_PROP_FPS);
         return true;

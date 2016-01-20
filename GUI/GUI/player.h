@@ -39,6 +39,7 @@ public:
     ~Player();
 
     bool loadVideo(string filename);
+    bool loadVideo(int videoId);
     void Play();
     void Stop();
     bool isStopped() const;
