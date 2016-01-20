@@ -25,6 +25,7 @@ private:
     QImage img;
     QImage img_gmm;
     int video;
+    GMM gmm;
 
 signals:
     void processedImage(const QImage &image, const QImage &image_gmm, int video);
@@ -38,6 +39,7 @@ public:
     ~Player();
 
     bool loadVideo(string filename);
+    bool loadVideo(int videoId);
     void Play();
     void Stop();
     bool isStopped() const;
@@ -48,7 +50,7 @@ public:
     double cf;
     int frameRate;
 
-    void gmm();
+    void gmm_run();
 };
 
 #endif // PLAYER_H

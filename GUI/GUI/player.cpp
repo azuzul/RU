@@ -15,15 +15,22 @@ Player::Player(QObject *parent,int video, double alpha, double cT, double covari
     this->covariance0 = covariance0;
     this->cf = cf;
     this->frameRate = frameRate;
+
+    gmm = GMM(this->alpha, this->cT, this->covariance0, this->cf);
+}
+
+bool Player::loadVideo(int videoInput){
+    capture.open(videoInput);
+
+    if(capture.isOpened()){
+        frameRate = (int)capture.get(CV_CAP_PROP_FPS);
+        return true;
+    }
+    return false;
 }
 
 bool Player::loadVideo(string filename){
-
-//    if(video == 0) {
-//        capture.open(0);
-//    } else {
-        capture.open(filename);
-//    }
+    capture.open(filename);
     if(capture.isOpened()){
         frameRate = (int)capture.get(CV_CAP_PROP_FPS);
         return true;
@@ -46,7 +53,7 @@ void Player::run()
 //    int delay = (1000/frameRate);
 //    std::cout << frameRate << std::endl;
 
-    gmm();
+    gmm_run();
 }
 
 Player::~Player()
@@ -73,11 +80,9 @@ bool Player::isStopped() const{
     return this->stop;
 }
 
-void Player::gmm() {
+void Player::gmm_run() {
     int i,j,k;
     i=j=k=0;
-
-    GMM gmm(this->alpha, this->cT, this->covariance0, this->cf);
 
     std::cout << "Parametar alpha: " << gmm.alpha << std::endl;
     std::cout << "Parametar cT: " << gmm.cT << std::endl;

@@ -59,11 +59,27 @@ void MainWindow::on_pushButton_clicked()
             msgBox.exec();
         }
 
-        if (!myPlayer1->loadVideo(filenames[1].toLatin1().data()))
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The selected video could not be opened!");
-            msgBox.exec();
+        if(filenames.size() < 2) {
+            if (!myPlayer1->loadVideo(0))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The selected video could not be opened!");
+                msgBox.exec();
+            }
+        } else {
+            if (!myPlayer1->loadVideo(filenames[1].toLatin1().data()))
+            {
+                QMessageBox msgBox;
+                msgBox.setText("The selected video could not be opened!");
+                msgBox.exec();
+            }
+        }
+    } else {
+        if(!myPlayer->loadVideo(0)) {
+
+        }
+        if(!myPlayer1->loadVideo(1)) {
+
         }
     }
 }
@@ -71,12 +87,14 @@ void MainWindow::on_pushButton_2_clicked()
 {
     myPlayer->alpha = ui->param_alpha->text().toDouble();
     myPlayer->cT = ui->param_cT->text().toDouble();
-    myPlayer->covariance0 = ui->param_covariance0->text().toDouble();
+    //myPlayer->covariance0 = ui->param_covariance0->text().toDouble();
+    myPlayer->covariance0 = 11.0;
     myPlayer->cf = ui->param_cF->text().toDouble();
 
     myPlayer1->alpha = ui->param_alpha->text().toDouble();
     myPlayer1->cT = ui->param_cT->text().toDouble();
-    myPlayer1->covariance0 = ui->param_covariance0->text().toDouble();
+    //myPlayer1->covariance0 = ui->param_covariance0->text().toDouble();
+    myPlayer1->covariance0 = 11.0;
     myPlayer1->cf = ui->param_cF->text().toDouble();
 
     if (myPlayer->isStopped())

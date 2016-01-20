@@ -1,0 +1,18 @@
+\BOOKMARK [0][-]{chapter.1}{Projektni zadatak}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Opis projektnog zadatka}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Pregled i opis srodnih rje\235enja}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Konceptualno rje\235enje zadatka}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Postupak rje\235avanja zadatka}{}% 5
+\BOOKMARK [1][-]{section.2.1}{Primjena GMM modela za odvajanje objekata od pozadine u slici}{chapter.2}% 6
+\BOOKMARK [2][-]{subsection.2.1.1}{Model Gaussove mje\235avine}{section.2.1}% 7
+\BOOKMARK [2][-]{subsection.2.1.2}{Biranje broja komponenti}{section.2.1}% 8
+\BOOKMARK [0][-]{chapter.3}{Ispitivanje rje\235enja}{}% 9
+\BOOKMARK [1][-]{section.3.1}{Ispitne Baze}{chapter.3}% 10
+\BOOKMARK [1][-]{section.3.2}{Rezultati ucenja i ispitavanja}{chapter.3}% 11
+\BOOKMARK [1][-]{section.3.3}{Analiza Rezultata}{chapter.3}% 12
+\BOOKMARK [0][-]{chapter.4}{Opis programske implementacije rje\235enja}{}% 13
+\BOOKMARK [1][-]{section.4.1}{OpenCV}{chapter.4}% 14
+\BOOKMARK [1][-]{section.4.2}{Qt}{chapter.4}% 15
+\BOOKMARK [1][-]{section.4.3}{Nacin kori\235tenja}{chapter.4}% 16
+\BOOKMARK [0][-]{chapter.5}{Zakljucak}{}% 17
+\BOOKMARK [0][-]{chapter*.5}{Literatura}{}% 18

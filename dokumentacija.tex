@@ -11,6 +11,8 @@
 \usepackage{titlesec}
 \usepackage{indentfirst}
 \usepackage{natbib}
+\usepackage{url}
+\usepackage{hyperref}
 \pagenumbering{arabic}
 \titleformat{\chapter}[hang] 
 {\centering\fontsize{16}{12}\bfseries}{\chaptertitlename\ \thechapter.}{1em}{}
@@ -101,12 +103,12 @@ Za svaki se model računaju parametri razdiobe za svaku komponentu na temelju sk
 \centering
 \captionof{figure}{Primjer pokretnog objekta u sceni}
 \end{center}
-\chapter{Postupak rješavanja zadatka}
-\section{Primjena GMM modela za odvajanje objekata od pozadine u slici}
+\chapter{Postupak rješavanja zadatka} \label{chap:Gmm}
+\section{Primjena GMM modela za odvajanje objekata od pozadine u slici}  \label{chap:Gmm_odvajanjeObjekata}
 Intenzitet svjetla na slici općenito zavisi od geometrije scene, položaju kamere i same osvijetljenosti scene. Ako pretpostavimo da se u videonadzornom sustavu ne mjenja položaj kamera te se stalno snima ista scena, jedino što može utjecati na promjene inteziteta svjetla u slikama jest osvijetljenost scene. Osvijetljenost scene se u praksi može mijenajti postupno kroz vrijeme ili iznenadno. Postupne se promjene osvijetljenja češće događaju u vanjskim scenama zbog promjene doba dana ili vremenskih prilika. Nagle promjene osvjetljenja u untrašnjim scenama mogu biti rezultat paljenja i gašenja rasvjete u prostoriji. Da bi se model mogao prilagođavati promjenama osvijetljenja u sceni, potrebno je neprestano ažurirati skup za učenje novim informacijama o osvijetljenju, a odbacivati stare. S tim ciljem odabire se  određeni vremenski period $T$, pa u trenutku $t$ na raspolaganju imamo skup uzoraka $X_T$. $$X_T=\{x^{(t)},x^{(t-1)},...,x^{(t-T)}\}$$  
 Odvajanje objekata od pozadine na slici može se promatrati kao klasifikacijski problem u dvije klase od kojih jedna pripada pozadini, a druga objektima. Za svaki piksel slike dakle treba donjeti odluku pripada li pozadini ili nekom od objekata. U tom kontekstu $X_T$ je naš skup za učenje na temelju kojeg se donose klasifikacijske odluke. Model koji se u okviru ovog rada koristi za klasifikaciju je model Gaussove mješavine.
 
-\subsection{Model Gaussove mješavine}
+\subsection{Model Gaussove mješavine} \label{chap:Gmm_mjesavina}
 
 Model mješane gustoće vjerojatnosti općenito modelira se kao linearna kombinacija $M$ gustoća vjerojatnosti:
 $$ p(\vec{x}) = \sum_{m=1}^{M}\pi_{m} p({\vec{x} \given \vec{\theta_{m}}}) $$
@@ -135,7 +137,7 @@ gdje je $c_f$ mjera maksimalnog udjela piksela koji mogu pripadati prednjem dije
 
 Dođe li novi objekt u scenu i ostane statičan neko vrijeme, vjerojatno će generirati novi stabilni klaster. Kako je stara pozadina sada zaklonjena tim objektom, težina njegovog klastera $\pi_{B+1}$ će se konstantno povećavati. Ukoliko taj objekt ostane statičan dovoljno dugo, njegova će težina postati veća od $c_f$ i smatrat će se dijelom pozadine.
 
-\subsection{Biranje broja komponenti}
+\subsection{Biranje broja komponenti} \label{chap:Gmm_brojKomponenti}
 
 Težina $ \pi_m $ opisuje koliko podataka pripada $ m $-toj komponenti GMM-a. To možemo promatrati kao vjerojatnost da uzorak dolazi iz $ m $-te komponente, a u ovom slučaju $ \pi_m $ predstavlja osnovnu multinomijalnu distribuciju. Pretpostavimo da imamo skup koji sadrži $ t $ uzoraka od kojih svaki pripada jednoj komponenti GMM-a. Također pretpostavimo da je broj uzoraka koji pripadaju $ m $-toj komponenti jednak:
 $$ n_m = \sum_{i=1}^{t} o_{m}^{(i)} $$ Za $ n_m $-ove pretpostavljamo da se ponašaju prema kategoričkoj ("multinomijalnoj") distribuciji opisanu sljedećom funkcijom izglednosti: $$ \mathcal{L}=\prod_{m=1}^{M} \pi_{m}^{n_m} $$ Za izračun maksimalne izglednosti (engl. \textit{Maximum Likelihood (ML)}) koristimo sljedeću formulu : $$ \frac{\partial }{\partial \hat{\pi}_m}\left( log\mathcal{L} + \lambda ( \sum_{m=1}^{M} \hat{\pi}_m - 1 ) \right) = 0 $$ Nakon rješavanja po $ \lambda $ dobijemo izraz: $$ \hat{\pi}_m^{(t)}=\frac{n_m}{t}=\frac{1}{t}\sum_{i=1}^{t}o_m^{(i)} $$
@@ -208,7 +210,59 @@ U scenama gdje objekti ulaze scenu i potom ostaju nepomični, ti se objekti smat
 Veliku ulogu igra i kamera kojom se snima video za obradu. Veća kvaliteta kamere daje manja odstupanja po pikselima i na kraju bolje rezultate rada aplikacije. Na primjer, obična web kamera daje mutne slike, zatim se i objekt brže stopi s okolinom, ako objekt postaje statičan u sceni. Zato korištenje kamere s boljom kvalitetom mogu pomoći napravljenoj aplikaciji da detektira objekte koji se vrlo malo gibaju, kao na primjer lišće na laganom povjetarcu.
 
 \chapter{Opis programske implementacije rješenja}
+
+Programsko rješenje napisano je u programskom jeziku C++ uz korištenje biblioteke OpenCV i programskog okvira Qt.
+
+\section{OpenCV}
+Razlog za korištenje biblioteke OpenCV je velika količina već implementiranih funkcija koje obuhvaćaju mnoga područja računalnog vida kao što su dohvaćanje slike s kamere ili videa i obrada slike općenito. 
+
+\textit{Open Computer Vision library} je biblioteka otvorenog koda pod BSD licencom koja sadrži preko 500 algoritama iz podrucja računalnog vida. Algoritmi rade na obradi slika u stvarnom vremenu. Dostupna je na Linux, Windows i MacOS X operacijskim sustavima, a pisana u programskim jezicima C i C++. Sadrži programska sučcelja prema Pythonu, Rubyu, Matlabu, i drugim jezicima.
+Sadrži module za rad sa matricnim strukturama podataka, rad sa video sadržajem iz datoteka ili kamera, procesiranje i transformaciju slika, izgradnju histograma i kontura, alate za pracenje pokretnih objekata, kalibriranje kamera, izgradnju projekcije i 3D pogleda, algoritme za strojno ucenje, te modul za izgradnju grafičkog sučelja.
+
+U ovom radu OpenCV korišten je za spajanje na web-kameru. Da bi dohvatili video, potrebno je funkciji \textit{VideoCapture} predati redni broj web-kamere ili naziv video datoteke. Nakon toga, čita se slika po slika i šalje u daljnju obradu.
+
+\section{Qt}
+Za izradu grafičkog sučelja korišten je programski okvir \textit{Qt} \cite{qtDocumentation}.
+Qt je multiplatformski (Linux, Windows, OS X, Symbian) radni okvir koji se široko koristi za razvoj aplikacija s grafičkim sučeljem u jeziku C++. Distribuiran je pod GNU Lesser General Public licencom, a dostupne su komercijalna verzija i \textit{open source} verzija (otvoreni kod).
+Osim za izradu grafičkih sučelja, Qt se može koristiti i za razvoj aplikacija bez grafičkog sučelja budući da nudi razna proširenja za C++ jezik poput vlastitih standardnih tipova podataka, kao i podršku za rad s bazama podataka, XML parsiranje, paralelizam te mrežno
+programiranje. Za početak rada dovoljno je skinuti i instalirati SDK za odgovarajući operacijski sustav. 
+SDK uz sve biblioteke sadrži i \textit{Qt Creator IDE}, jednostavno razvojno okruženje s raznim mogućnostima koje uključuju i sučelja za dizajniranje prozora aplikacija.
+
+U ovom radu korišten je Qt otvorenog koda verzije 5.5. i razvojno okruženje \textit{Qt Creator IDE}.
+
+\section{Način korištenja}
+Pri pokretanju programa javlja se prozor sa četiri dijela u kojima se prikazuju izvorne i obrađene slike s uklonjenom pozadinom ispod njih (Slika \ref{fig:gui}). Za učitavanje videa potrebno je pritiskom na gumb \textit{Load} odabrati izvor učitavanja. Obrada počinje pritiskom na gumb \textit{Play}.
+
+\begin{center}
+\includegraphics[width=\textwidth]{slike/gui_ss.jpg}
+\centering
+\captionof{figure}{Grafičko sučelje aplikacije}
+\label{fig:gui}
+\end{center}
+
+Ovisno o izvoru učitavanja slika, aplikacija može raditi na dva načina.
+Prvi način je onaj u kojemu se slike prikazuju i obrađuju u stvarnom vremenu, odnosno izravno s kamere. U tom slučaju korisnik odabire dvije kamere s koje će dobivati sliku. Ako se korisnik odluči za ovaj način rada, preporuča se koristiti dvije web-kamere. Ako je korisnik unaprijed snimio video koji želi obraditi, odabire opciju \textit{Load} i odabire dva željena videa. Kako bi algoritam dao zadovoljavajuće rezultate, preporuča se učitati video minimalne rezolucije 720x540. Također, aplikacija podržava mješoviti način rada u kojem su izvori slike jedan video i jedna kamera. Taj se način pokreće ako korisnik učita samo jedan video. Tada će se za drugi izvor slike automatski koristiti web kamera ako ona postoji na računalu.
+
+Bez obzira na način na koji aplikacija radi, ispod originalnih slika u stvarnom se vremenu prikazuje njihova verzija obrađena algoritmom GMM opisanom u poglavlju \ref{chap:Gmm}. Budući da uspješnost algoritma ovisi o parametrima koje algoritam koristi, korisniku je omogućeno podešavanje nekih od parametara. To su:
+
+\begin{itemize}
+  	\item[$\bullet$] Frame rate - Parametar koji određuje broj frameova (slika) u sekundi. Pretpostavljena vrijednost je 30.
+ 	\item[$\bullet$] Alpha - konstanta koja ograničava utjecacaj starijih informacija, postavlja se na otprilike 1/T   (\ref{chap:Gmm_odvajanjeObjekata})
+  	\item[$\bullet$] Cf - Mjera maksimalnog udjela piksela koji mogu pripadati prednjem dijelu slike bez utjecaja na model pozadine (\ref{chap:Gmm_mjesavina})
+	\item[$\bullet$] Ct - Fiksirana prihvatljiva vrijednost pristranosti (\ref{chap:Gmm_brojKomponenti})
+\end{itemize}
+
 \chapter{Zaključak}
+U okviru ovog rada ostvarena je aplikacija za odvajanje pozadine uporabom algoritma GMM koja radi u stvarnom vremenu (engl. \textit{real time}).
+GMM algoritam prilagođava se promjenama osvijetljenja u sceni neprestanim ažuriranjem informacija o osvijetljenju i odbacivanjem starih. Koristi Gaussovu normalnu razdiobu i za svaki piksel određuje pripada li pozadini ili ne. 
+Pokazalo se kako uklanjanje pozadine nije jednostavan problem, a osim GMM-om moguće ga je riješiti i na druge načine. Neki od njih su korištenje jezgreno baziranih gustoća razdioba, skriveni Markovljevi modeli (HMM) i slično.
+
+Opisani postupak za uklanjanje pozadine u većini slučajeva na ispitnim uzorcima daje dobre rezultate u uklanjanju pozadine s videa kao i s web-kamere u stvarnom vremenu. Budući da algoritam cijelo vrijeme ažurira informacije, potencijalni problemi se javljaju kada je vremenski interval u kojem objekti na sceni miruju prevelik. Također, problem su video zapisi loše kvalitete.
+Iako se model pokazao dosta uspješnim, poboljšanja su uvijek moguća. Uz određene prilagodbe parametara rezultati modela mogu biti bolji. 
+Drugo poboljšanja moglo bi bilo korištenje nekog drugog algoritma koji pokazuje bolje rezultate od GMM-a ili korištenje više algoritama istovremeno, odnosno hibrida. Također, aplikacija bi se mogla i proširiti i umjesto dvije kamere, moglo bi se koristiti više kamera. U tom slučaju neka bi se scena mogla promatrati iz više od dva kuta, a aplikacija iskoristiti za videonadzor i detekciju objekata koji se kreću na sceni.
+
+Razvijeno rješenje pokazalo je dobre rezultate uz korištenje algoritma GMM. Moglo bi poslužiti kao temelj za daljnji rad na području uklanjanja pozadine, a uz opisana poboljšanja učinkovitost bi bila još bolja.
+
 \bibliography{literatura}
 \bibliographystyle{fer}
 \end{document}
